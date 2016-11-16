@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+	
+	<!-- ================================================================================================== -->
+	
+	
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  ft_order set order_status = '11' where order_id='748476708966130605'
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			"ZD_ID",
+			"NAME",
+			"BIANMA",
+			"ORDY_BY",
+			"PARENT_ID",
+			"JB",
+			"P_BM"
+		from 
+			"SYS_ZIDIAN"
+		where 
+			"ZD_ID" = #{ZD_ID}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into "SYS_ZIDIAN" (
+			"ZD_ID",
+			"NAME",
+			"BIANMA",
+			"ORDY_BY",
+			"PARENT_ID",
+			"JB",
+			"P_BM"
+		) values (
+			#{ZD_ID},
+			#{NAME},
+			#{BIANMA},
+			#{ORDY_BY},
+			#{PARENT_ID},
+			#{JB},
+			#{P_BM}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="orderlistPage" parameterType="page" resultType="pd">
+		select "ORDER_ID",
+		"ORDER_BIG_TYPE",
+		"C4IF5_ORDER_NO",
+		"ORDER_TIME",
+		"PAY_TIME",
+		"PNR_NO",
+		"PNR_STATUS",
+		"ORDER_STATUS",
+		"PAR_VALUE",
+		"REWARD_RATE",
+		"REWARD_MONEY",
+		"PAY_STATUS",
+		"DELIVERY_TYPE",
+		"RETURN_MONEY",
+		"REMARK",
+		"LEG_TYPE",
+		"ORDER_TYPE",
+		"PARENT_PNR_NO",
+		"INSURANCE_CODE",
+		"POLICY_ID",
+		"PLAT_POLICY_ID",
+		"CONTACT_NAME",
+		"CONTACT_MOBILE",
+		"CONTACT_PHONE",
+		"DISTR_REMARK",
+		"ORDER_NOTE",
+		"USER_ID",
+		"SUPPLIER",
+		"SUPPLIER_ORDER_ID",
+		"SUPPLIER_RID",
+		"SUPPLIER_SOURCE",
+		"SUPPLIER_TICKET_ID",
+		"DEP_DATE",
+		"DPORT",
+		"APORT",
+		"SUPPLIER_PRICE",
+		"USER_PAY_AMOUNT"
+		from "FT_ORDER"
+		order by "ORDER_TIME"
+	</select>
+	
+	<!-- 查询总数 -->
+	<select id="findCount" parameterType="pd" resultType="pd">
+		select 
+			count("ZD_ID") ZS
+		from 
+			"SYS_ZIDIAN"
+		where 
+			"PARENT_ID" = #{ZD_ID}
+	</select>
+	
+	<!-- 查询某编码 -->
+	<select id="findBmCount" parameterType="pd" resultType="pd">
+		select 
+			"ZD_ID"
+		from 
+			"SYS_ZIDIAN"
+		where 
+			"BIANMA" = #{BIANMA}
+		<if test="ZD_ID != null and ZD_ID != ''">
+			and "ZD_ID" != #{ZD_ID} 
+		</if>
+	</select>
+	
+	<!-- 删除用户 -->
+	<delete id="delete" parameterType="pd">
+		delete from "SYS_ZIDIAN" 
+		where 
+			"ZD_ID" = #{ZD_ID}
+	</delete>
+	
+	<!-- ================================================================================================== -->
+	
+</mapper>

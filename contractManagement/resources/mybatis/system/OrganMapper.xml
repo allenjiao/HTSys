@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrganMapper">
+
+	<resultMap type="Organ" id="organResultMap">
+		<id column="ORGAN_ID" property="ORGAN_ID"/>
+		<result column="ORGAN_NAME" property="ORGAN_NAME"/>
+		<result column="ORGAN_TYPE" property="ORGAN_TYPE"/>
+		<result column="PARENT_ID" property="PARENT_ID"/>
+		<result column="ORGAN_LEVEL" property="ORGAN_LEVEL"/>
+		<result column="ORGAN_DESC" property="ORGAN_DESC"/>
+		<result column="ORGAN_ORDER" property="ORGAN_ORDER"/>
+		<result column="doubleName" property="doubleName"/>
+	</resultMap>
+
+	<select id="listTreeOrgan" parameterType="String" resultMap="organResultMap">
+<!-- 		SELECT -->
+<!-- 		* -->
+<!-- 		FROM "SYS_ORGAN" o -->
+<!-- 		start with o.parent_id=#{parentId} -->
+<!-- 		connect by prior o.organ_id=o.parent_id -->
+<!-- 		order siblings by o.organ_order -->
+		select o.*,
+           decode(o2.organ_name, null, '', o2.organ_name || '→') ||
+           o.organ_name doubleName
+      FROM "SYS_ORGAN" o, sys_organ o2
+     where o2.organ_id(+) = o.parent_id
+     start with o.parent_id = #{parentId}
+    connect by prior o.organ_id = o.parent_id
+     order siblings by o.organ_order
+	</select>
+	
+	<select id="listAllTopOrgan" resultMap="organResultMap">
+		select * from "SYS_ORGAN" 
+		where "PARENT_ID" = '0' order by "ORGAN_ORDER" 
+	</select>
+	
+	<select id="listSubOrganByParentId" parameterType="String" resultMap="organResultMap">
+		select  * from "SYS_ORGAN"
+		where "PARENT_ID" = #{parentId} order by "ORGAN_ORDER" 
+	</select>
+	
+	<select id="getOrganById" parameterType="pd" resultType="pd">
+		select  *
+		 from "SYS_ORGAN" 
+		 where organ_id=#{ORGAN_ID}
+	</select>
+	
+	<update id="updateOrgan" parameterType="pd">
+		update "SYS_ORGAN" 
+		<set>
+			<if test="ORGAN_NAME!=null and ORGAN_NAME!=''">
+				"ORGAN_NAME"=#{ORGAN_NAME},
+			</if>
+			<if test="ORGAN_DESC!=null and ORGAN_DESC!=''">
+				"ORGAN_DESC" =#{ORGAN_DESC},
+			</if>
+			<if test="PARENT_ID!=null and PARENT_ID!=''">
+				"PARENT_ID"=#{PARENT_ID},
+			</if>
+			<if test="ORGAN_ORDER!=null and ORGAN_ORDER!=''">
+				"ORGAN_ORDER"=#{ORGAN_ORDER},
+			</if>
+			<if test="ORGAN_TYPE!=null and ORGAN_TYPE!=''">
+				"ORGAN_TYPE"=#{ORGAN_TYPE,jdbcType=VARCHAR},
+			</if>
+			<if test="ORGAN_LEVEL!=null and ORGAN_LEVEL!=''">
+				"ORGAN_LEVEL"=#{ORGAN_LEVEL,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where organ_id=#{ORGAN_ID}
+	</update>
+	
+	<insert id="insertOrgan" parameterType="pd">
+		insert into "SYS_ORGAN" (
+			"ORGAN_ID",
+			"ORGAN_NAME",
+			"ORGAN_DESC",
+			"PARENT_ID",
+			"ORGAN_ORDER",
+			"ORGAN_TYPE",
+			"ORGAN_LEVEL"
+		) values (
+			#{ORGAN_ID,jdbcType=VARCHAR},
+			#{ORGAN_NAME,jdbcType=VARCHAR},
+			#{ORGAN_DESC,jdbcType=VARCHAR},
+			#{PARENT_ID,jdbcType=VARCHAR},
+			#{ORGAN_ORDER,jdbcType=VARCHAR},
+			#{ORGAN_TYPE,jdbcType=VARCHAR},
+			#{ORGAN_LEVEL,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<delete id="deleteOrganById" parameterType="String">
+		delete from "SYS_ORGAN" 
+		where "ORGAN_ID"=#{ORGAN_ID} 
+		or "PARENT_ID"=#{ORGAN_ID}
+	</delete>
+	
+	<select id="findMaxId" parameterType="pd" resultType="String">
+		select MAX(to_number(ORGAN_ID)) "OID" FROM "SYS_ORGAN"
+	</select>
+	
+	<!-- 以下为新sql -->
+	
+	<select id="organlistPage" parameterType="page" resultType="pd">
+		select  z1."ORGAN_ID",
+				z1."ORGAN_NAME",
+				z1."ORGAN_TYPE",
+				z1."PARENT_ID",
+				z1."ORGAN_LEVEL",
+				z1."ORGAN_DESC",
+				z1."ORGAN_ORDER",
+				z2."ORGAN_NAME" PNAME
+		from "SYS_ORGAN" z1
+		left join
+			"SYS_ORGAN" z2 
+		on  z1."PARENT_ID" = z2."ORGAN_ID" 
+		where 1=1
+		<if test="pd.PARENT_ID != null and pd.PARENT_ID != ''">
+		    and z1."PARENT_ID" = #{pd.PARENT_ID}
+		</if>
+		<if test="pd.ORGAN_NAME != null and pd.ORGAN_NAME != ''">
+			and z1."ORGAN_NAME" LIKE CONCAT(CONCAT('%', #{pd.ORGAN_NAME}),'%') 
+		</if>
+		<if test="pd.PNAME != null and pd.PNAME != ''">
+			and z2."ORGAN_NAME" LIKE CONCAT(CONCAT('%', #{pd.PNAME}),'%') 
+		</if>
+		order by z1."ORGAN_ORDER"
+	</select>
+
+	
+</mapper>

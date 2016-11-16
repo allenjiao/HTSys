@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SystemLogMapper">
+	
+	<!-- 分页查询系统日志列表 -->
+	<select id="systemloglistPage" parameterType="page" resultType="pd">
+		select 
+			"LOG_ID",
+			"USER_ID",
+			"LOGIN_ACCOUNT",
+			"FUNCTION_ID",
+			"FUNCTION_NAME",
+			"TIME"
+		from "BASE_SYSTEM_LOG"
+		where 1=1
+		<if test="pd.LOGIN_ACCOUNT != null and pd.LOGIN_ACCOUNT != ''"><!-- 登录账户检索 -->
+			and "LOGIN_ACCOUNT" LIKE CONCAT(CONCAT('%', #{pd.LOGIN_ACCOUNT}),'%') 
+		</if>
+		<if test="pd.FUNCTION_NAME != null and pd.FUNCTION_NAME != ''"><!-- 功能名称检索 -->
+			and "FUNCTION_ID" LIKE CONCAT(CONCAT('%', #{pd.FUNCTION_ID}),'%') 
+		</if>
+		<if test="pd.TIME != null and pd.TIME != ''"><!-- 时间检索 -->
+			and "SYSTEM_ID" LIKE CONCAT(CONCAT('%', #{pd.SYSTEM_ID}),'%')
+		</if>
+	</select>
+	
+	<!-- 添加 系统日志-->
+	<insert id="saveSystemLog" parameterType="pd">
+		insert into "BASE_SYSTEM_LOG" (
+			"LOG_ID",
+			"USER_ID",
+			"LOGIN_ACCOUNT",
+			"FUNCTION_ID",
+			"FUNCTION_NAME",
+			"TIME"
+		) values (
+			#{LOG_ID},
+			#{USER_ID},
+			#{LOGIN_ACCOUNT},
+			#{FUNCTION_ID},
+			#{FUNCTION_NAME},
+			#{TIME}
+		)
+	</insert>
+	
+	<!-- 通过id查找 -->
+	<select id="findObjectById" parameterType="pd" resultType="pd">
+		select  
+			"LOG_ID",
+			"USER_ID",
+			"LOGIN_ACCOUNT",
+			"FUNCTION_ID",
+			"FUNCTION_NAME",
+			"TIME"
+		from "BASE_SYSTEM_LOG" 
+		where "LOG_ID" = #{LOG_ID}
+	</select>
+	
+	<delete id="deleteSystemLog" parameterType="pd">
+		delete from "BASE_SYSTEM_LOG" 
+		where 
+			"LOG_ID" = #{LOG_ID}
+	</delete>
+</mapper>
