@@ -1,5 +1,6 @@
 package com.fh.controller.system.login;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,8 +52,7 @@ public class LoginController extends BaseController {
 		try {
 			String USERNAME = session.getAttribute("USERNAME").toString();
 			pd.put("USERNAME", USERNAME);
-			String ROLE_ID = userService.findByUId(pd).get("ROLE_ID")
-					.toString();// 通过USERNAME获取角色ID
+			String ROLE_ID = userService.findByUId(pd).get("ROLE_ID").toString();// 通过USERNAME获取角色ID
 
 			pd.put("ROLE_ID", ROLE_ID);
 
@@ -130,7 +130,7 @@ public class LoginController extends BaseController {
 		userService.saveIP(pd);
 	}
 
-	// private User user;
+//	private User user;
 
 	/**
 	 * 访问登录页
@@ -153,8 +153,7 @@ public class LoginController extends BaseController {
 	@RequestMapping(value = "/login_login")
 	public ModelAndView login(HttpSession session) throws Exception {
 		mv.clear();
-		String sessionCode = (String) session
-				.getAttribute(Const.SESSION_SECURITY_CODE);
+		String sessionCode = (String) session.getAttribute(Const.SESSION_SECURITY_CODE);
 		String errInfo = "";
 
 		pd = this.getPageData();
@@ -170,21 +169,18 @@ public class LoginController extends BaseController {
 			String USERNAME = pd.get("loginname").toString();
 			String PASSWORD = pd.get("password").toString();
 			pd.put("USERNAME", USERNAME);
-			if (Tools.notEmpty(sessionCode)
-					&& sessionCode.equalsIgnoreCase(code)) {
+			if (Tools.notEmpty(sessionCode) && sessionCode.equalsIgnoreCase(code)) {
 				String passwd = MD5.md5(PASSWORD);
 				pd.put("PASSWORD", passwd);
 				pd = userService.getUserByNameAndPwd(pd);
 				if (pd != null) {
-					pd.put("LAST_LOGIN", new java.text.SimpleDateFormat(
-							"yyyy-MM-dd hh:mm:ss").format(new Date())
+					pd.put("LAST_LOGIN", new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date())
 							.toString());
 					userService.updateLastLogin(pd);
 
-					User user = userService.getUserAndRoleById(pd
-							.getString("USER_ID"));
+					User user = userService.getUserAndRoleById((BigDecimal) pd.get("USER_ID"));
 
-					// user.setUSER_ID(pd.getString("USER_ID"));
+//					user.setUSER_ID(pd.getString("USER_ID"));
 					user.setUSERNAME(pd.getString("USERNAME"));
 					user.setPASSWORD(pd.getString("PASSWORD"));
 					user.setNAME(pd.getString("NAME"));
@@ -197,10 +193,8 @@ public class LoginController extends BaseController {
 					// 避免每次拦截用户操作时查询数据库，以下将用户所属角色权限、用户权限限都存入session
 					session.setAttribute(Const.SESSION_USER, user);
 					session.removeAttribute(Const.SESSION_SECURITY_CODE);
-					session.setAttribute(Const.SESSION_ROLE_RIGHTS, user
-							.getRole().getRIGHTS());// 将角色权限存入session
-					session.setAttribute(Const.SESSION_USER_RIGHTS,
-							user.getRIGHTS());// 将用户权限存入session
+					session.setAttribute(Const.SESSION_ROLE_RIGHTS, user.getRole().getRIGHTS());// 将角色权限存入session
+					session.setAttribute(Const.SESSION_USER_RIGHTS, user.getRIGHTS());// 将用户权限存入session
 					session.setAttribute("USERNAME", user.getUSERNAME());
 					session.setAttribute("QX", this.getUQX(session));
 				} else {
@@ -210,7 +204,7 @@ public class LoginController extends BaseController {
 				errInfo = "验证码输入有误！";
 			}
 			if (Tools.isEmpty(errInfo)) {
-				// mv.setViewName("redirect:resource/listResource.do");
+//				mv.setViewName("redirect:resource/listResource.do");
 				mv.setViewName("redirect:login_index.do");
 			} else {
 				mv.addObject("errInfo", errInfo);
@@ -245,17 +239,13 @@ public class LoginController extends BaseController {
 				List<Menu> menuList = menuService.listAllMenu();
 				if (Tools.notEmpty(userRights) || Tools.notEmpty(roleRights)) {
 					for (Menu menu : menuList) {
-						menu.setHasMenu(RightsHelper.testRights(userRights,
-								menu.getMENU_ID())
-								|| RightsHelper.testRights(roleRights,
-										menu.getMENU_ID()));
+						menu.setHasMenu(RightsHelper.testRights(userRights, menu.getMENU_ID())
+								|| RightsHelper.testRights(roleRights, menu.getMENU_ID()));
 						if (menu.isHasMenu()) {
 							List<Menu> subMenuList = menu.getSubMenu();
 							for (Menu sub : subMenuList) {
-								sub.setHasMenu(RightsHelper.testRights(
-										userRights, sub.getMENU_ID())
-										|| RightsHelper.testRights(roleRights,
-												sub.getMENU_ID()));
+								sub.setHasMenu(RightsHelper.testRights(userRights, sub.getMENU_ID())
+										|| RightsHelper.testRights(roleRights, sub.getMENU_ID()));
 							}
 						}
 					}
@@ -272,21 +262,14 @@ public class LoginController extends BaseController {
 				 */
 
 				// FusionCharts
-				// String strXML =
-				// "<graph caption='前12个月订单销量柱状图' xAxisName='月份' yAxisName='值' decimalPrecision='0' formatNumberScale='0'>"
-				// +
-				// "<set name='2013-05' value='4' color='AFD8F8'/><set name='2013-04' value='0' color='AFD8F8'/>"
-				// +
-				// "<set name='2013-03' value='0' color='AFD8F8'/><set name='2013-02' value='0' color='AFD8F8'/>"
-				// +
-				// "<set name='2013-01' value='0' color='AFD8F8'/><set name='2012-01' value='0' color='AFD8F8'/>"
-				// +
-				// "<set name='2012-11' value='0' color='AFD8F8'/><set name='2012-10' value='0' color='AFD8F8'/>"
-				// +
-				// "<set name='2012-09' value='0' color='AFD8F8'/><set name='2012-08' value='0' color='AFD8F8'/>"
-				// +
-				// "<set name='2012-07' value='0' color='AFD8F8'/><set name='2012-06' value='0' color='AFD8F8'/></graph>";
-				// mv.addObject("strXML", strXML);
+//				String strXML = "<graph caption='前12个月订单销量柱状图' xAxisName='月份' yAxisName='值' decimalPrecision='0' formatNumberScale='0'>"
+//						+ "<set name='2013-05' value='4' color='AFD8F8'/><set name='2013-04' value='0' color='AFD8F8'/>"
+//						+ "<set name='2013-03' value='0' color='AFD8F8'/><set name='2013-02' value='0' color='AFD8F8'/>"
+//						+ "<set name='2013-01' value='0' color='AFD8F8'/><set name='2012-01' value='0' color='AFD8F8'/>"
+//						+ "<set name='2012-11' value='0' color='AFD8F8'/><set name='2012-10' value='0' color='AFD8F8'/>"
+//						+ "<set name='2012-09' value='0' color='AFD8F8'/><set name='2012-08' value='0' color='AFD8F8'/>"
+//						+ "<set name='2012-07' value='0' color='AFD8F8'/><set name='2012-06' value='0' color='AFD8F8'/></graph>";
+//				mv.addObject("strXML", strXML);
 
 				mv.setViewName("system/admin/index");
 				mv.addObject("user", user);

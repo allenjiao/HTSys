@@ -1,5 +1,6 @@
 package com.fh.controller.system.user;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -135,7 +136,7 @@ public class UserService {
 //	}
 
 	//通过id获取数据
-	public User getUserAndRoleById(String USER_ID) throws Exception {
+	public User getUserAndRoleById(BigDecimal USER_ID) throws Exception {
 		
 		return (User) dao.findForObject("UserMapper.getUserAndRoleById", USER_ID);
 		
