@@ -1,8 +1,2 @@
 /com/
-/config.properties
-/ehcache.xml
-/log4j.properties
-/log4j.xml
 /mina2/
-/mybatis/
-/spring/
