@@ -24,8 +24,8 @@
 
 <!--  		<property name="url" value="jdbc:oracle:thin:@10.10.21.15:1521:orcl"/> -->
     	<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl"/>
-		<property name="username" value="gdrmr"/>
-		<property name="password" value="gdrmr"/>
+		<property name="username" value="ora"/>
+		<property name="password" value="ora"/>
 	</bean>
 	
 	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">   
